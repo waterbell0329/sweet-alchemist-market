@@ -1,0 +1,374 @@
+@import '@fontsource/press-start-2p/latin-400.css';
+@import '@fontsource/fredoka/latin-400.css';
+@import '@fontsource/fredoka/latin-500.css';
+@import '@fontsource/fredoka/latin-600.css';
+@import '@fontsource/fredoka/latin-700.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --choco: #1a120b;
+  --choco2: #2c1e14;
+  --choco3: #3b2819;
+  --choco4: #523823;
+  --gold: #ffd700;
+  --silver: #e2e8f0;
+  --mint: #10b981;
+  --coral: #f43f5e;
+  --cream: #fffdf9;
+  --caramel: #e8954a;
+  --ink: #000;
+  --accent: var(--gold);
+  --accent2: var(--caramel);
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: var(--choco);
+  overflow: hidden;
+}
+
+body {
+  font-family: Fredoka, 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Noto Sans CJK KR', system-ui, sans-serif;
+  color: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Line breaking: Korean breaks between words (not mid-word), long words still wrap instead of
+   overflowing, and short labels/titles split into even lines instead of leaving one orphan word. */
+body {
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+[lang='ko'] {
+  word-break: keep-all;
+}
+.stage span[lang] {
+  text-wrap: balance;
+}
+
+/* Last Call: the whole board switches to gold + coral accents */
+.phase-lastcall {
+  --accent: var(--coral);
+  --accent2: var(--gold);
+}
+
+/* ---------- stage: 1920×1080 design canvas scaled to the viewport ---------- */
+.stage-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #0d0905;
+}
+.stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  flex: none;
+  transform-origin: center center;
+  overflow: hidden;
+  background-color: var(--choco);
+  /* waffle-press pixel texture */
+  background-image:
+    linear-gradient(90deg, rgba(255, 215, 0, 0.035) 2px, transparent 2px),
+    linear-gradient(rgba(255, 215, 0, 0.035) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.25) 2px, transparent 2px),
+    linear-gradient(rgba(0, 0, 0, 0.25) 2px, transparent 2px);
+  background-size: 32px 32px, 32px 32px, 32px 32px, 32px 32px;
+  background-position: 0 0, 0 0, 2px 2px, 2px 2px;
+}
+
+@layer components {
+  .font-pixel {
+    font-family: 'Press Start 2P', ui-monospace, Consolas, monospace;
+    letter-spacing: 0;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* neobrutalist panel with pixel-notched corners */
+  .panel {
+    position: relative;
+    background: var(--choco2);
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink), inset 0 4px 0 rgba(255, 255, 255, 0.06);
+  }
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--choco);
+    border-bottom: 4px solid var(--ink);
+    padding: 6px 14px;
+    min-height: 48px;
+  }
+  .gem {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--ink), 3px 3px 0 3px var(--ink);
+  }
+  .slot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #8b8b8b;
+    border: 4px solid var(--ink);
+    box-shadow: inset 4px 4px 0 #555, inset -4px -4px 0 #c6c6c6;
+  }
+  .slot-dark {
+    background: var(--choco3);
+    box-shadow: inset 4px 4px 0 #1f150c, inset -4px -4px 0 #6b4a2e;
+  }
+  .qty-badge {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+  }
+
+  /* chunky press buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    font-weight: 600;
+    line-height: 1.05;
+    user-select: none;
+    cursor: pointer;
+    transition: transform 60ms ease-out, box-shadow 60ms ease-out, filter 120ms;
+  }
+  .btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .btn:active:not(:disabled),
+  .btn.is-pressed {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 var(--ink);
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+  .btn:focus-visible,
+  .focus-ring:focus-visible {
+    outline: 4px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-mint { background: var(--mint); color: var(--ink); }
+  .btn-coral { background: var(--coral); color: var(--cream); }
+  .btn-cream { background: var(--cream); color: var(--ink); }
+  .btn-silver { background: var(--silver); color: var(--ink); }
+  .btn-choco { background: var(--choco4); color: var(--cream); }
+  .btn-dark { background: var(--choco); color: var(--cream); }
+
+  .seg {
+    display: inline-flex;
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    background: var(--choco);
+  }
+  .seg > button {
+    border-right: 3px solid var(--ink);
+    cursor: pointer;
+    color: var(--cream);
+    transition: background 100ms;
+  }
+  .seg > button:last-child {
+    border-right: 0;
+  }
+  .seg > button:hover:not(:disabled):not([aria-pressed='true']) {
+    background: var(--choco4);
+  }
+  .seg > button[aria-pressed='true'] {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .seg > button:focus-visible {
+    outline: 4px solid var(--gold);
+    outline-offset: -4px;
+  }
+  .seg > button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .coin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 3px solid var(--ink);
+    font-family: 'Press Start 2P', monospace;
+    color: var(--ink);
+    flex: none;
+  }
+  .coin-gold {
+    background: radial-gradient(circle at 35% 30%, #fff6b0 0 12%, transparent 13%),
+      conic-gradient(from 200deg, #b8860b, #ffd700, #fff1a1, #ffd700, #c99a06, #ffd700, #b8860b);
+    box-shadow: inset 0 0 0 3px #e0b000, 2px 2px 0 var(--ink);
+  }
+  .coin-silver {
+    background: radial-gradient(circle at 35% 30%, #ffffff 0 12%, transparent 13%),
+      conic-gradient(from 200deg, #8a94a3, #e2e8f0, #ffffff, #cbd5e1, #8a94a3, #e2e8f0, #8a94a3);
+    box-shadow: inset 0 0 0 3px #a6b0bf, 2px 2px 0 var(--ink);
+  }
+
+  .lcd {
+    background: #0a0704;
+    border: 4px solid var(--ink);
+    box-shadow: inset 0 0 0 3px #3b2819, 6px 6px 0 var(--ink);
+  }
+
+  .hazard {
+    background: repeating-linear-gradient(-45deg, var(--accent) 0 18px, var(--ink) 18px 36px);
+  }
+
+  .stamp {
+    border: 6px solid currentColor;
+    padding: 10px 26px;
+    transform: rotate(-6deg);
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  .input-pixel {
+    background: var(--cream);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: inset 3px 3px 0 #d6cfc2;
+    font-family: 'Press Start 2P', monospace;
+    text-align: center;
+  }
+  .input-pixel:focus-visible {
+    outline: 4px solid var(--gold);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------------- motion ---------------- */
+@keyframes flash-up {
+  0% { background-color: rgba(244, 63, 94, 0.7); transform: scale(1.12); }
+  100% { background-color: transparent; transform: scale(1); }
+}
+@keyframes flash-down {
+  0% { background-color: rgba(16, 185, 129, 0.7); transform: scale(1.12); }
+  100% { background-color: transparent; transform: scale(1); }
+}
+.flash-up { animation: flash-up 1.4s ease-out; }
+.flash-down { animation: flash-down 1.4s ease-out; }
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-14px, 6px); }
+  30% { transform: translate(12px, -8px); }
+  45% { transform: translate(-10px, 4px); }
+  60% { transform: translate(8px, -4px); }
+  75% { transform: translate(-4px, 2px); }
+}
+.shake { animation: shake 0.6s ease-in-out 2; }
+
+@keyframes pop-in {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.pop-in { animation: pop-in 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+
+@keyframes slide-down {
+  from { transform: translateY(-28px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.slide-down { animation: slide-down 0.3s ease-out; }
+
+/* Shrinking bar on cards that close themselves. */
+@keyframes auto-close { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.auto-close-bar { transform-origin: left; animation-name: auto-close; animation-timing-function: linear; animation-fill-mode: forwards; }
+
+@keyframes float-crown {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-16px) rotate(4deg); }
+}
+.float-crown { animation: float-crown 1.6s ease-in-out infinite; }
+
+@keyframes rays {
+  to { transform: rotate(360deg); }
+}
+.rays {
+  background: repeating-conic-gradient(rgba(255, 215, 0, 0.22) 0 10deg, transparent 10deg 20deg);
+  animation: rays 14s linear infinite;
+}
+
+@keyframes coin-rise {
+  0% { transform: translateY(30px); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+.coin-rise { animation: coin-rise 1.4s ease-out infinite; }
+
+@keyframes arrow-drop {
+  0% { transform: translateY(-30px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(30px); opacity: 0; }
+}
+.arrow-drop { animation: arrow-drop 1.1s ease-in infinite; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes reel-blur {
+  0% { transform: translateY(-6px); }
+  50% { transform: translateY(6px); }
+  100% { transform: translateY(-6px); }
+}
+.reel-moving { animation: reel-blur 90ms linear infinite; }
+
+@keyframes toast-in {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.toast-in { animation: toast-in 0.22s ease-out; }
+
+@keyframes ping-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.8); }
+  100% { box-shadow: 0 0 0 18px rgba(255, 215, 0, 0); }
+}
+.ping-ring { animation: ping-ring 1.4s ease-out 3; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .rays, .float-crown, .coin-rise, .arrow-drop, .reel-moving { animation: none !important; }
+}

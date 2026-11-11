@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tsbuildinfo
+*.log
+
+# local tool settings
+.claude/
+
+# copy of dist-single/index.html prepared for sending by chat
+share/
